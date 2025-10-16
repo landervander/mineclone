@@ -9,6 +9,7 @@
 
 #include "glm/detail/func_packing_simd.inl"
 #include "glm/ext/matrix_transform.hpp"
+#include "shader/Shader.h"
 
 void error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
@@ -200,7 +201,7 @@ int main(void)
     int width, height, nrChannels;
     unsigned char* data = stbi_load("dirt.png", &width, &height, &nrChannels, 0);
 
-    printf("Texture loaded with resolution %dx%d", width, height);
+    printf("Texture loaded with resolution %dx%d\n", width, height);
 
     GLuint texture;
     glGenTextures(1, &texture);
@@ -214,33 +215,8 @@ int main(void)
 
     stbi_image_free(data);
 
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        printf("%s\n", infoLog);
-    }
-
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    unsigned int shaderProgram = glCreateProgram();
-
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glUseProgram(shaderProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    const Shader cubeShader("../shaders/cube.vert", "../shaders/cube.frag");
+    cubeShader.Use();
 
     GLuint VBO, VAO, EBO;
 
@@ -280,10 +256,6 @@ int main(void)
         }
     }
 
-
-
-    unsigned int mvpLoc = glGetUniformLocation(shaderProgram, "MVP");
-
     while (!glfwWindowShouldClose(window)) {
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
@@ -313,7 +285,7 @@ int main(void)
         for (const auto& pos : cubePositions) {
             glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
             glm::mat4 mvp = projection * view * model;
-            glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+            cubeShader.SetMat4("MVP", glm::value_ptr(mvp));
             glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         }
 
