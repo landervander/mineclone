@@ -7,7 +7,19 @@
 
 
 class Block {
+public:
+    enum BlockType {
+        AIR,
+        DIRT,
+        STONE
+    };
 
+    Block() : m_BlockType(BlockType::AIR) {}
+    explicit Block(BlockType blockType);
+
+    [[nodiscard]] BlockType GetBlockType() const;
+private:
+    BlockType m_BlockType;
 };
 
 
