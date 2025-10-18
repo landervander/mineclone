@@ -4,51 +4,40 @@
 
 #ifndef MINECLONE_CHUNK_H
 #define MINECLONE_CHUNK_H
-#include <vector>
+
 #include <block/Block.h>
-
-#include "glad/glad.h"
-
-struct Vertex {
-    struct Position {
-        float X;
-        float Y;
-        float Z;
-    } Position;
-
-    struct UV {
-        float x;
-        float y;
-    } UV;
-};
+#include <glm/glm.hpp>
 
 class Chunk {
-private:
+public:
     static constexpr int SIZE_X = 16;
     static constexpr int SIZE_Y = 256;
     static constexpr int SIZE_Z = 16;
 
-    Block blocks[SIZE_X][SIZE_Y][SIZE_Z] = {};
-    GLuint VAO = 0, VBO = 0, EBO = 0;
+    glm::ivec2 chunkPos = {};
 
-    std::vector<Vertex> cubeVertices = {};
-    std::vector<unsigned int> cubeIndices = {};
+    Chunk() = default;
 
-    float chunkPos[3] = { 0.f, 0.f, 0.f };
-
-    bool IsBlockSolid(int x, int y, int z);
-    void AddFace(int face, int x, int y, int z, unsigned int &indexOffset);
-
-public:
-    Chunk(float x, float y, float z);
-
+    void SetChunkPosition(int x, int y);
     void GenerateBlocks();
 
-    void BuildMesh();
+    [[nodiscard]] glm::vec2 GetChunkPosition() const;
+    [[nodiscard]] Block GetBlockAt(int x, int y, int z) const;
+    [[nodiscard]] bool IsBlockSolid(int x, int y, int z) const;
 
-    void Draw() const;
+    bool operator==(const Chunk& other) const {
+        return chunkPos.x == other.chunkPos.x && chunkPos.y == other.chunkPos.y;
+    }
 
-    Block GetBlockAt(int x, int y, int z);
+private:
+    Block blocks[SIZE_X][SIZE_Y][SIZE_Z] = {};
+};
+
+class ChunkHasher {
+    public:
+    std::size_t operator()(const Chunk& chunk) const {
+        return std::hash<int>()(chunk.chunkPos.x ^ (std::hash<int>()(chunk.chunkPos.y) << 1));
+    }
 };
 
 

@@ -9,9 +9,11 @@
 #include <stb_image.h>
 
 #include "chunk/Chunk.h"
+#include "chunk/ChunkMesh.h"
 #include "glm/detail/func_packing_simd.inl"
 #include "glm/ext/matrix_transform.hpp"
 #include "shader/Shader.h"
+#include "world/World.h"
 
 void error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
@@ -118,7 +120,7 @@ const char* fragmentShaderSource = R"(
 float yaw = -90.0f;
 float pitch = 0.0f;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -216,17 +218,19 @@ int main(void)
     const Shader cubeShader("../shaders/cube.vert", "../shaders/cube.frag");
     cubeShader.Use();
 
-    Chunk testChunk(0.f, 0.f, 0.f);
-    testChunk.GenerateBlocks();
-    testChunk.BuildMesh();
-    Chunk testChunk2(1.f, 0.f, 0.f);
-    testChunk2.GenerateBlocks();
-    testChunk2.BuildMesh();
+    World world;
+    world.GenerateWorld();
 
-    float cameraSpeed = 10.f;
+    // Chunk chunk(0.f, 0.f, 0.f);
+    // chunk.GenerateBlocks();
+    // chunk.BuildMesh();
+
+    float cameraSpeed = 50.f;
     float lastFrame = 0.0f;
 
     while (!glfwWindowShouldClose(window)) {
+        world.playerPosition = cameraPos;
+
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -256,8 +260,9 @@ int main(void)
         glm::mat4 mvp = projection * view * model;
         cubeShader.SetMat4("MVP", glm::value_ptr(mvp));
         // glDrawElements(GL_TRIANGLES, cubeIndices.size(), GL_UNSIGNED_INT, 0);
-        testChunk.Draw();
-        testChunk2.Draw();
+        world.RenderWorld();
+
+        // printf("Position: %f, %f, %f\n", cameraPos.x, cameraPos.y, cameraPos.z);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

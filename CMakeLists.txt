@@ -21,6 +21,10 @@ add_executable(mineclone
         src/chunk/ChunkMesh.h
         src/world/World.cpp
         src/world/World.h
+        src/types/Types.cpp
+        src/types/Types.h
+        src/world/WorldRenderer.cpp
+        src/world/WorldRenderer.h
 )
 
 target_include_directories(mineclone PRIVATE src)
