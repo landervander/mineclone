@@ -21,7 +21,6 @@ public:
 
 private:
     GLuint VAO = 0, VBO = 0, EBO = 0;
-    GLuint indexCount = 0;
 
     std::vector<MinecloneTypes::Vertex> cubeVertices = {};
     std::vector<unsigned int> cubeIndices = {};

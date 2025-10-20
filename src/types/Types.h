@@ -20,12 +20,6 @@ namespace MinecloneTypes {
             float y;
         } UV;
     };
-
-    struct MeshData {
-        int chunkX, chunkZ;
-        std::vector<MinecloneTypes::Vertex> vertices;
-        std::vector<unsigned int> indices;
-    };
 }
 
 

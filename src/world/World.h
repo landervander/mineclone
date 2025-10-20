@@ -20,8 +20,9 @@ public:
     glm::vec3 playerPosition = {};
 private:
     int viewDistance = 4;
-    std::unordered_map<Chunk, ChunkMesh, ChunkHasher> chunks = {};
-    std::queue<MinecloneTypes::MeshData> meshQueue = {};
+    // std::unordered_map<Chunk, ChunkMesh, ChunkHasher> chunks = {};
+    std::vector<std::pair<Chunk, ChunkMesh>> chunks = {};
+    std::queue<ChunkMesh> meshQueue = {};
 
     void GenerationThread();
 };
