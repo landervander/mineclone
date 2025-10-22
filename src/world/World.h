@@ -8,6 +8,8 @@
 #include <queue>
 #include <chunk/Chunk.h>
 #include <chunk/ChunkMesh.h>
+#include <atomic>
+#include <mutex>
 
 class World {
 public:
@@ -15,14 +17,19 @@ public:
 
     void GenerateWorld();
     void Update();
-    void RenderWorld() const;
+    void RenderUI();
+    void RenderWorld();
+    Chunk* GetChunkAt(int x, int y) const;
 
     glm::vec3 playerPosition = {};
 private:
-    int viewDistance = 4;
+    int viewDistance = 8;
     // std::unordered_map<Chunk, ChunkMesh, ChunkHasher> chunks = {};
-    std::vector<std::pair<Chunk, ChunkMesh>> chunks = {};
-    std::queue<ChunkMesh> meshQueue = {};
+    std::vector<Chunk*> chunks = {}; // Logical Chunks
+    std::queue<ChunkMesh*> chunkMeshQueue = {}; // Build Mesh
+    std::vector<ChunkMesh*> chunksToRender = {}; // Render Mesh
+
+    std::atomic<bool> running;
 
     void GenerationThread();
 };

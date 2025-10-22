@@ -21,8 +21,6 @@ void Chunk::GenerateBlocks() {
             }
         }
     }
-
-    printf("%llu\n", sizeof(blocks));
 }
 
 Block Chunk::GetBlockAt(int x, int y, int z) const {

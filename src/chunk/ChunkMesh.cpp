@@ -64,6 +64,9 @@ void ChunkMesh::AddFace(const int face, const int x, const int y, const int z, u
     indexOffset += 4; // Only increment when we actually add a face
 }
 
+ChunkMesh::ChunkMesh(const Chunk &chunkData) : chunkData(chunkData) {
+}
+
 void ChunkMesh::BuildMesh() {
     unsigned int indexOffset = 0;
 
@@ -86,25 +89,25 @@ void ChunkMesh::BuildMesh() {
         }
     }
 
-    // VertexArrayObject
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    // VertexBufferObject
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * sizeof(MinecloneTypes::Vertex), cubeVertices.data(), GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(MinecloneTypes::Vertex), NULL);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(MinecloneTypes::Vertex), (void *) (3 * sizeof(float)));
-
-    // ElementBufferObjects
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices.size() * sizeof(unsigned int), cubeIndices.data(),
-                 GL_STATIC_DRAW);
+    // // VertexArrayObject
+    // glGenVertexArrays(1, &VAO);
+    // glBindVertexArray(VAO);
+    //
+    // // VertexBufferObject
+    // glGenBuffers(1, &VBO);
+    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * sizeof(MinecloneTypes::Vertex), cubeVertices.data(), GL_STATIC_DRAW);
+    //
+    // glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(MinecloneTypes::Vertex), NULL);
+    // glEnableVertexAttribArray(1);
+    // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(MinecloneTypes::Vertex), (void *) (3 * sizeof(float)));
+    //
+    // // ElementBufferObjects
+    // glGenBuffers(1, &EBO);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, cubeIndices.size() * sizeof(unsigned int), cubeIndices.data(),
+    //              GL_STATIC_DRAW);
 
 
 }

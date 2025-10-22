@@ -7,6 +7,7 @@ add_subdirectory(lib/glfw)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/glm)
 add_subdirectory(lib/stb)
+add_subdirectory(lib/imgui)
 
 
 add_executable(mineclone
@@ -29,10 +30,11 @@ add_executable(mineclone
 
 target_include_directories(mineclone PRIVATE src)
 
-target_link_libraries(mineclone PRIVATE
+target_link_libraries(mineclone PUBLIC
         glfw
         glad
         opengl32
         glm
         stb
+        imgui
 )

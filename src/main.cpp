@@ -15,6 +15,10 @@
 #include "shader/Shader.h"
 #include "world/World.h"
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 void error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
 }
@@ -26,101 +30,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
-// Vertex vertices[] = {
-//     // positions         // UVs
-//     {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}}, // 0
-//     {{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}}, // 1
-//     {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // 2
-//     {{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // 3
-//     {{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // 4
-//     {{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // 5
-//     {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f}}, // 6
-//     {{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f}}  // 7
-// };
-//
-
-//
-// Vertex vertices[] = {
-//     // Front face
-//     {{-0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}}, // bottom left
-//     {{ 0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}}, // bottom right
-//     {{ 0.5f,  0.5f,  0.5f}, {1.0f, 1.0f}}, // top right
-//     {{-0.5f,  0.5f,  0.5f}, {0.0f, 1.0f}}, // top left
-//
-//     // Back face
-//     {{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}}, // bottom left
-//     {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}}, // bottom right
-//     {{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}}, // top right
-//     {{ 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}}, // top left
-//
-//     // Left face
-//     {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}},
-//     {{-0.5f, -0.5f,  0.5f}, {1.0f, 0.0f}},
-//     {{-0.5f,  0.5f,  0.5f}, {1.0f, 1.0f}},
-//     {{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}},
-//
-//     // Right face
-//     {{ 0.5f, -0.5f,  0.5f}, {0.0f, 0.0f}},
-//     {{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}},
-//     {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}},
-//     {{ 0.5f,  0.5f,  0.5f}, {0.0f, 1.0f}},
-//
-//     // Bottom face
-//     {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f}},
-//     {{ 0.5f, -0.5f, -0.5f}, {1.0f, 0.0f}},
-//     {{ 0.5f, -0.5f,  0.5f}, {1.0f, 1.0f}},
-//     {{-0.5f, -0.5f,  0.5f}, {0.0f, 1.0f}},
-//
-//     // Top face
-//     {{-0.5f,  0.5f,  0.5f}, {0.0f, 0.0f}},
-//     {{ 0.5f,  0.5f,  0.5f}, {1.0f, 0.0f}},
-//     {{ 0.5f,  0.5f, -0.5f}, {1.0f, 1.0f}},
-//     {{-0.5f,  0.5f, -0.5f}, {0.0f, 1.0f}},
-// };
-//
-// unsigned int indices[] = {
-//     0, 1, 2, 2, 3, 0,       // front
-//     4, 5, 6, 6, 7, 4,       // back
-//     8, 9,10,10,11, 8,       // left
-//     12,13,14,14,15,12,      // right
-//     16,17,18,18,19,16,      // bottom
-//     20,21,22,22,23,20       // top
-// };
-
-const char* vertexShaderSource = R"(
-    #version 330
-    layout (location = 0) in vec3 aPos;
-    layout (location = 1) in vec2 aTexCoord;
-
-    out vec2 TexCoord;
-
-    uniform mat4 MVP;
-
-    void main()
-    {
-        gl_Position = MVP * vec4(aPos, 1.0);
-        TexCoord = aTexCoord;
-    }
-)";
-
-const char* fragmentShaderSource = R"(
-    #version 330 core
-    out vec4 FragColor;
-
-    in vec2 TexCoord;
-    uniform sampler2D ourTexture;
-
-    void main()
-    {
-        // FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-        FragColor = texture(ourTexture, TexCoord);
-    }
-)";
-
 float yaw = -90.0f;
 float pitch = 0.0f;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 20.0f, 0.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -185,12 +98,28 @@ int main(void)
         system("pause");
     }
 
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-
     glfwMakeContextCurrent(window);
     gladLoadGL();
     glfwSwapInterval(1);
+
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    ImGui::StyleColorsDark();
+
+    float main_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.ScaleAllSizes(main_scale);
+    style.FontScaleDpi = main_scale;
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
 
     glEnable(GL_DEPTH_TEST);
     // TODO: Re enable once chunks are considered stable
@@ -219,16 +148,12 @@ int main(void)
     cubeShader.Use();
 
     World world;
-    world.GenerateWorld();
-
-    // Chunk chunk(0.f, 0.f, 0.f);
-    // chunk.GenerateBlocks();
-    // chunk.BuildMesh();
 
     float cameraSpeed = 50.f;
     float lastFrame = 0.0f;
 
     while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
         world.playerPosition = cameraPos;
 
         float currentFrame = glfwGetTime();
@@ -247,9 +172,27 @@ int main(void)
             cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * velocity;
 
 
+        world.Update();
+        // world.RenderWorld();
+
+        // printf("Position: %f, %f, %f\n", cameraPos.x, cameraPos.y, cameraPos.z);
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::SetNextWindowPos(ImVec2(15, 15));
+        ImGui::SetNextWindowSize(ImVec2(150, 150));
+        ImGui::Begin("Debug");
+        ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
+        ImGui::Text("Coordinates:\nX: %.3f\nY: %.3f\nZ: %.3f\n", cameraPos.x, cameraPos.y, cameraPos.z);
+        ImGui::End();
+
+        world.RenderUI();
+
+        ImGui::Render();
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
-
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -259,13 +202,11 @@ int main(void)
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 mvp = projection * view * model;
         cubeShader.SetMat4("MVP", glm::value_ptr(mvp));
-        // glDrawElements(GL_TRIANGLES, cubeIndices.size(), GL_UNSIGNED_INT, 0);
+
         world.RenderWorld();
 
-        // printf("Position: %f, %f, %f\n", cameraPos.x, cameraPos.y, cameraPos.z);
-
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
-        glfwPollEvents();
     }
 
 
